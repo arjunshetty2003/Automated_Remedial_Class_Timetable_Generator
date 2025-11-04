@@ -1,0 +1,41 @@
+[project]
+name = "remedial-scheduler-backend"
+version = "0.1.0"
+description = "FastAPI backend for the AI-Based Remedial Class Scheduler"
+authors = [{ name = "Automated Remedial Timetable Team" }]
+requires-python = ">=3.10"
+dependencies = [
+    "fastapi>=0.115.0",
+    "uvicorn[standard]>=0.30.0",
+    "sqlalchemy[asyncio]>=2.0.32",
+    "pydantic>=2.7.0",
+    "pydantic-settings>=2.4.0",
+    "email-validator>=2.1.0",
+    "alembic>=1.13.0",
+    "asyncmy>=0.2.9",
+    "python-dotenv>=1.0.1",
+    "langchain>=0.2.0",
+    "openai>=1.40.0",
+    "google-generativeai>=0.7.0",
+    "pandas>=2.2.0"
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.2.0",
+    "pytest-asyncio>=0.23.0",
+    "httpx>=0.27.0",
+    "ruff>=0.6.9",
+    "trio>=0.26.0"
+]
+
+[project.scripts]
+remedial-api = "app.main:run"
+
+[build-system]
+requires = ["setuptools>=65.0.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[tool.pytest.ini_options]
+asyncio_mode = "strict"
+pythonpath = ["app"]
