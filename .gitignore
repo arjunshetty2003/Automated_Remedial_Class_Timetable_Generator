@@ -11,4 +11,7 @@ frontend/.next/
 frontend/out/
 mcp-server/node_modules/
 mcp-server/.env
+
+# MCP configuration with secrets
+.mcp.json
 .DS_Store

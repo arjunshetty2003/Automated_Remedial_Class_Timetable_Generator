@@ -1,0 +1,12 @@
+{
+  "mcpServers": {
+    "remedial-scheduler": {
+      "command": "node",
+      "args": ["mcp-server/index.js"],
+      "env": {
+        "SUPABASE_URL": "https://your-project-ref.supabase.co",
+        "SUPABASE_SERVICE_ROLE_KEY": "your-service-role-key-here"
+      }
+    }
+  }
+}
