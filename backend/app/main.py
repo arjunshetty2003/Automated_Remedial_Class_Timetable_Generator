@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from fastapi import FastAPI
 
-from app.api.routes import health_router, students_router, teachers_router, timetables_router
+from app.api.routes import classes_router, health_router, students_router, subject_marks_router, teachers_router, timetables_router
 from app.core.config import get_settings
 
 
@@ -11,7 +11,9 @@ def create_app() -> FastAPI:
     app = FastAPI(title=settings.app_name, version="0.1.0")
 
     app.include_router(health_router)
+    app.include_router(classes_router)
     app.include_router(students_router)
+    app.include_router(subject_marks_router)
     app.include_router(teachers_router)
     app.include_router(timetables_router)
 

@@ -1,0 +1,17 @@
+{
+  "name": "remedial-scheduler-mcp",
+  "version": "1.0.0",
+  "description": "MCP server for Remedial Class Scheduler with Supabase integration",
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.0.4",
+    "@supabase/supabase-js": "^2.47.10"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

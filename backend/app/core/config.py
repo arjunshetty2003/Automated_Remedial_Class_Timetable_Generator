@@ -7,7 +7,8 @@ class Settings(BaseSettings):
 
     app_name: str = "AI-Based Remedial Class Scheduler"
     environment: str = "development"
-    database_url: str = "mysql+asyncmy://user:password@localhost:3306/remedial_db"
+    # Supabase PostgreSQL connection (pooler mode on port 6543)
+    database_url: str = "postgresql+asyncpg://postgres:password@localhost:5432/postgres"
     openai_api_key: str | None = None
     google_api_key: str | None = None
 

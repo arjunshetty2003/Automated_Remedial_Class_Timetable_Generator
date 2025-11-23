@@ -1,20 +1,30 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status, Query
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import selectinload
 
 from app import schemas
 from app.db.session import get_session
 from app.models.student import Student
 from app.models.teacher import Teacher
-from app.models.timetable import Timetable
+from app.models.timetable import Timetable, TimetableType
 from app.services.scheduler import SchedulerService
 
 router = APIRouter(prefix="/timetables", tags=["timetables"])
 
 
 @router.get("", response_model=list[schemas.TimetableRead])
-async def list_timetables(session: AsyncSession = Depends(get_session)) -> list[schemas.TimetableRead]:
-    result = await session.scalars(select(Timetable).order_by(Timetable.slot_start))
+async def list_timetables(
+    timetable_type: str | None = Query(default=None, description="Filter by type: regular or remedial"),
+    session: AsyncSession = Depends(get_session)
+) -> list[schemas.TimetableRead]:
+    """List all timetables, optionally filtered by type."""
+    query = select(Timetable).order_by(Timetable.slot_start)
+
+    if timetable_type:
+        query = query.where(Timetable.timetable_type == timetable_type)
+
+    result = await session.scalars(query)
     timetables = result.all()
     return [schemas.TimetableRead.model_validate(timetable) for timetable in timetables]
 
@@ -33,14 +43,28 @@ async def create_timetable(
 
 @router.post("/auto", response_model=list[schemas.TimetableRead])
 async def auto_generate_timetable(session: AsyncSession = Depends(get_session)) -> list[schemas.TimetableRead]:
+    """
+    Generate remedial timetable using AI.
+    This will avoid conflicts with existing regular timetables.
+    """
     scheduler = SchedulerService(session)
-    student_records = await session.scalars(select(Student).where(Student.marks < 10))
+
+    # Get all students with their subject marks eagerly loaded
+    student_records = await session.scalars(
+        select(Student).options(selectinload(Student.subject_marks))
+    )
     teacher_records = await session.scalars(select(Teacher))
 
     students = [schemas.StudentRead.model_validate(student) for student in student_records.all()]
     teachers = [schemas.TeacherRead.model_validate(teacher) for teacher in teacher_records.all()]
 
-    suggestions = await scheduler.generate_timetable(students, teachers)
+    # Get existing regular timetables to avoid conflicts
+    existing_timetables_result = await session.scalars(
+        select(Timetable).where(Timetable.timetable_type == TimetableType.REGULAR)
+    )
+    existing_timetables = [schemas.TimetableRead.model_validate(tt) for tt in existing_timetables_result.all()]
+
+    suggestions = await scheduler.generate_timetable(students, teachers, existing_timetables)
     return suggestions
 
 
